@@ -1,0 +1,96 @@
+import io;
+
+class Request {
+    protected property httpMethod;
+    protected property uri;
+    protected property headers;
+    protected property info;
+
+    protected property body;
+
+    public method __ctor(string httpMethod, string uri, hash headers, string body = "", hash info)
+    {
+        self.httpMethod = httpMethod.upper();
+        self.uri = "http://foo.bar" + uri;
+        self.headers = headers;
+        self.body = body;
+        self.info = info;
+    }
+
+    public method getMethod()
+    {
+        return self.httpMethod;
+    }
+
+    public method isGet()
+    {
+        return self.httpMethod == "GET";
+    }
+
+    public method isPost()
+    {
+        return self.httpMethod == "POST";
+    }
+
+    public method isSafe()
+    {
+        return list[['GET', 'OPTIONS', 'HEAD']].has(self.httpMethod);
+    }
+
+    public method isIdempotent()
+    {
+        return list[['GET', 'OPTIONS', 'HEAD', 'PUT', 'DELETE']].has(self.httpMethod);
+    }
+
+    public method getUri()
+    {
+        return self.uri;
+    }
+
+    public method getUriParts(part = null)
+    {
+        (ret, matches) = regex.match('|^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(?:.*))?|', self.uri);
+
+        if (! ret) {
+            return false;
+        }
+
+        if (part) {
+            return matches[part] ?? false;
+        }
+
+        return matches;
+    }
+
+    public method getHeaders()
+    {
+        return self.headers;
+    }
+
+    public method hasHeader(string header)
+    {
+        return self.headers.has(header);
+    }
+
+    public method getHeader(string header, default_value = false)
+    {
+        return self.headers.has(header) ? self.header['header'] : default_value;
+    }
+
+    public method hasInfo(string header)
+    {
+        return self.info.has(header);
+    }
+
+    public method getInfo(string header)
+    {
+        return self.info.has(header) ? self.info['header'] : null;
+    }
+
+    public method getBody()
+    {
+        return self.body;
+    }
+
+
+}

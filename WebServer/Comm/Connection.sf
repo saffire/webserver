@@ -1,0 +1,53 @@
+import io;
+
+class Connection {
+    public property socket;
+
+    public method __ctor(socket sock)
+    {
+        self.socket = sock;
+    }
+
+    public method close()
+    {
+        self.socket.close();
+    }
+
+    public method write(... args)
+    {
+        foreach (args as s)  {
+            io.println("OUT> ", s.trim());
+            self.socket.write(s);
+        }
+    }
+
+    public method readLine()
+    {
+        s = "";
+        do {
+            c = self.socket.read(1);
+            if (c == "\n" || c == "\r") {
+//                io.println('Eating \r or \n');
+            } else {
+                s += c;
+//                io.println("Readed byte: ", c, "   > Total: ",s);
+            }
+        } while (c != "\n");
+
+        s = s.rtrim(s);
+        io.println("IN > ", s);
+
+        return s;
+    }
+
+    public method getHost()
+    {
+        return self.socket.getHost();
+    }
+
+    public method getPort()
+    {
+        return self.socket.getPort();
+    }
+
+}

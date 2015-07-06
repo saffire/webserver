@@ -1,0 +1,51 @@
+import Http from \WebServer\Protocol;
+import Connection from Comm;    // or: from \WebServer\Comm;
+import io\socket;
+import io;
+import os;
+
+class WebServer {
+    protected property config;
+    protected property processor;
+
+    public method __ctor(string host = "127.0.0.1", numerical port = 4000, string doc_root = "docroot", string index_file = "index.html") {
+        if (doc_root[0] != '/') {
+            doc_root = os.cwd() + '/' + doc_root;
+        }
+
+        self.config = hash[[
+            'host' : host,
+            'port' : port,
+            'doc_root' : doc_root,
+            'index_file' : index_file,
+        ]];
+
+        self.processor = Http(self.config);
+    }
+
+    public method run()
+    {
+        // Setup listening socket
+        socket = socket(socket.AF_INET, socket.SOCK_STREAM, 0);
+        socket.setOption(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
+        socket.bind(self.config['host'], self.config['port']);
+        socket.listen(50);
+
+        io.println("> Serving Saffire on ", self.config['host'], ":", self.config['port']);
+        io.println("> Press CTRL-C to quit.");
+
+
+        while (true) {
+            // Listen (blocking) for incoming requests
+            io.println("> Accepting connections...");
+            client_socket = socket.accept();
+
+            // Create connection and let the processor handle it
+            connection = Connection(client_socket);
+            self.processor.handle(connection);
+
+            // Close (client) connection
+            connection.close();
+        }
+    }
+}
