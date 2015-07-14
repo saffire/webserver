@@ -1,9 +1,9 @@
-import WebServer\WebServer;
+import \WebServer\WebServer;
 import io;
 
 host = saffire.args(1) ?? "127.0.0.1";
 port = (saffire.args(2) ?? 4000).__numerical();
-root = saffire.args(3) ?? "docroot";
+root = saffire.args(3) ?? "./docroot";
 index = saffire.args(4) ?? "index.html";
 
 ws = WebServer(host, port, root, index);

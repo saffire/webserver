@@ -1,22 +1,17 @@
-import Http from \WebServer\Protocol;
-import Connection from Comm;    // or: from \WebServer\Comm;
-import io\socket;
-import io;
-import os;
+import \WebServer\Protocol\Http;
+import Comm\Connection;    /* or: from \WebServer\Comm; */
+import io, os, io\socket;
 
 class WebServer {
     protected property config;
     protected property processor;
 
-    public method __ctor(string host = "127.0.0.1", numerical port = 4000, string doc_root = "docroot", string index_file = "index.html") {
-        if (doc_root[0] != '/') {
-            doc_root = os.cwd() + '/' + doc_root;
-        }
-
+    public method __ctor(string host = "127.0.0.1", numerical port = 4000, string doc_root = "./docroot", string index_file = "index.html")
+    {
         self.config = hash[[
             'host' : host,
             'port' : port,
-            'doc_root' : doc_root,
+            'doc_root' : os.realpath(doc_root),
             'index_file' : index_file,
         ]];
 

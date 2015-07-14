@@ -1,8 +1,6 @@
-import os;
-import io;
-import io\file;
-import Response  from \WebServer\Protocol\Http;
-import ResponseCode from \WebServer\Protocol\Http;
+import os, io, io\file;
+import \WebServer\Protocol\Http\Response;
+import \WebServer\Protocol\Http\ResponseCode;
 
 class Kernel {
     protected property config;
@@ -14,17 +12,35 @@ class Kernel {
 
     public method process(Request request)
     {
-        io.println("PATH: ", request.getUriParts(3));
-
         target = os.realpath(self.config['doc_root'] + request.getUriParts(3));
-        /* if (self.config['doc_root'] in target) */
-        if (target) {
-            response = Response(ResponseCode.STATUS_OK, "", hash[[]], "");
-            response.setBody(file.open(target, "r").contents());
-            response.headers['Content-Type'] = 'text/html';
-        } else {
-            response = Response(ResponseCode.STATUS_NOT_FOUND, "", hash[[]], "");
+
+        io.println("> Candidate (1): ", target);
+        pos = target.index(self.config['doc_root']);
+        if (pos && pos != 0) {
+            // target was not within docroot
+            return Response(ResponseCode.STATUS_NOT_FOUND, "", hash[[]], "404 - Not found");
         }
+
+        // Check if we are an existing dir, if not, prepend default index file
+        stat = os.stat(target);
+        if (stat && stat.S_ISDIR()) {
+            target += '/' + self.config['index_file'];
+            io.println("> Candidate (2): ", target);
+        }
+
+        // Final check if target is a regular file. If not, 404
+        stat = os.stat(target);
+        if (! stat || ! stat.S_ISREG()) {
+            // 404
+            return Response(ResponseCode.STATUS_NOT_FOUND, "", hash[[]], "404 - Not found");
+        }
+
+        // Check if ends on directory, if so, add index file
+        io.println("> Serving: ", target);
+
+        response = Response(ResponseCode.STATUS_OK, "", hash[[]], "");
+        response.setBody(file.open(target, "r").contents());
+        response.headers['Content-Type'] = 'text/html';
 
         return response;
     }

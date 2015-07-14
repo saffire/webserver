@@ -1,10 +1,6 @@
-import Response from Http;
-import ResponseCode from Http;
-import Request from Http;
-import Kernel from Http;
-import Processor from \WebServer;
-import io;
-import datetime;
+import Http\Response, Http\ResponseCode, Http\Request, Http\Kernel;
+import \WebServer\Processor;
+import io, datetime;
 
 class Http implements Processor {
     protected property connection;
@@ -117,7 +113,7 @@ class Http implements Processor {
         io.println("> Response status[", response.getStatusCode(),"] Body[", response.getBody().length(),"]");
 
         // Send initial header line
-        self.connection.write("HTTP/1.1 " + response.getStatusCode().__string() + " " + response.getStatusText().upper() +0 "\r\n");
+        self.connection.write("HTTP/1.1 " + response.getStatusCode().__string() + " " + response.getStatusText().upper() + "\r\n");
 
         // Send headers
         foreach (response.headers as k,v) {

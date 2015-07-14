@@ -1,4 +1,4 @@
-import Connection from Comm;
+import Comm\Connection;
 
 interface Processor {
     public method handle(Connection connection);
